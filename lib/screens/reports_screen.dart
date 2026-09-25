@@ -6,6 +6,7 @@ import 'package:share_plus/share_plus.dart';
 import '../app_state.dart';
 import '../models.dart';
 import '../utils.dart';
+import '../ad_service.dart';
 
 class ReportsScreen extends StatefulWidget {
   const ReportsScreen({super.key});
@@ -44,7 +45,11 @@ class _ReportsScreenState extends State<ReportsScreen> {
         SizedBox(
           width: double.infinity,
           child: ElevatedButton(
-            onPressed: () => setState(() => results = state.data.transactions.where((t) => t.date.compareTo(from) >= 0 && t.date.compareTo(to) <= 0).toList()),
+            onPressed: () {
+              setState(() => results = state.data.transactions.where((t) => t.date.compareTo(from) >= 0 && t.date.compareTo(to) <= 0).toList());
+              // Only offered right after a generated summary — never mid-task.
+              AdService.instance.maybeShowAfterReport();
+            },
             child: const Text('Generate'),
           ),
         ),
