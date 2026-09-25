@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'app_state.dart';
+import 'ad_service.dart';
 import 'theme.dart';
 import 'screens/auth_screen.dart';
 import 'screens/home_shell.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  // Loads the AdMob SDK. Uses Google's official TEST ad unit IDs until you
+  // swap in your own from admob.google.com — see lib/ad_service.dart.
+  await MobileAds.instance.initialize();
+  AdService.instance.preload();
   runApp(const BudgetMateApp());
 }
 
