@@ -10,12 +10,28 @@ workflows:
           flutter create --platforms=android .
       - name: Configure permissions and AdMob App ID
         script: |
-          MANIFEST=android/app/src/main/AndroidManifest.xml
+          python3 - <<'PYEOF'
+          path = "android/app/src/main/AndroidManifest.xml"
+          with open(path, "r") as f:
+              content = f.read()
           # Mic + network permissions (needed for voice entry)
-          sed -i 's#<application#<uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <uses-permission android:name="android.permission.INTERNET" />\n    <application#' "$MANIFEST"
+          content = content.replace(
+              "<application",
+              '<uses-permission android:name="android.permission.RECORD_AUDIO" />\n    '
+              '<uses-permission android:name="android.permission.INTERNET" />\n    <application',
+              1,
+          )
           # AdMob App ID — this is Google's official TEST App ID.
           # Replace with your real one from admob.google.com before going live.
-          sed -i 's#</application>#<meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" android:value="ca-app-pub-3940256099942544~3347511713"/>\n    </application>#' "$MANIFEST"
+          content = content.replace(
+              "</application>",
+              '<meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" '
+              'android:value="ca-app-pub-3940256099942544~3347511713"/>\n    </application>',
+          )
+          with open(path, "w") as f:
+              f.write(content)
+          print("AndroidManifest.xml patched successfully.")
+          PYEOF
       - name: Get packages
         script: |
           flutter pub get
